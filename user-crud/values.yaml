@@ -204,7 +204,7 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    nginx.ingress.kubernetes.io/auth-url: "http://auth-svc.default.svc.cluster.local:8349/api/v1/auth/verify"
+    nginx.ingress.kubernetes.io/auth-url: "{{ printf \"http://%s:%d/api/v1/auth/verify\" .Values.services.auth.name (int .Values.services.auth.port) }}"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-User-ID"
   hosts:
     - host: arch.homework
