@@ -1,0 +1,15 @@
+{{- if .Values.application.prometheus.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "user-crud.fullname" . }}-svc-mon-app
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      {{- include "user-crud.labels" . | nindent 6 }}
+  endpoints:
+    - port: web
+      interval: {{ .Values.application.prometheus.interval }}
+{{- end }}

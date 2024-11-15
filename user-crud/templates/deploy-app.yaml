@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-crud.fullname" . }}-deploy
+  labels:
+    {{- include "user-crud.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "user-crud.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "user-crud.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "user-crud.application.image" . }}
+          imagePullPolicy: {{ .Values.application.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.application.http.port }}
+              protocol: TCP
+          env:
+            - name: QUARKUS_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.application.name }}
+                  key: db_url
+            - name: QUARKUS_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.application.name }}
+                  key: db_username
+            - name: QUARKUS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.application.name }}
+                  key: db_password
+            - name: QUARKUS_DB_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.application.name }}
+                  key: application.db.log
+            - name: QUARKUS_DB_GENERATION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.application.name }}
+                  key: application.db.generation
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.application.name }}
+                  key: application.port
+            - name: PROMETHEUS_HISTOGRAM_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.application.name }}
+                  key: application.prometheus.histogram-enabled
+            - name: PROMETHEUS_HISTOGRAM_PERCENTILES
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.application.name }}
+                  key: application.prometheus.histogram-percentiles
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}

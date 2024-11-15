@@ -1,0 +1,15 @@
+{{- if .Values.db_app.prometheus.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "user-crud.fullname" . }}-svc-db-exporter
+  labels:
+    app: {{ include "user-crud.fullname" . }}-db-exporter
+spec:
+  selector:
+    app: {{ include "user-crud.fullname" . }}-db-exporter
+  ports:
+    - name: web
+      port: {{ .Values.exporter_db.port }}
+      targetPort: {{ .Values.exporter_db.port }}
+{{- end }}

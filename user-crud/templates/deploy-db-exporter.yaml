@@ -1,0 +1,27 @@
+{{- if .Values.db_app.prometheus.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-crud.fullname" . }}-db-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "user-crud.fullname" . }}-db-exporter
+  template:
+    metadata:
+      labels:
+        app: {{ include "user-crud.fullname" . }}-db-exporter
+    spec:
+      containers:
+        - name: postgres-exporter
+          image: {{ include "user-crud.exporter_db.image" . }}
+          ports:
+            - containerPort: {{ .Values.exporter_db.port }}
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.application.name }}
+                  key: exporter_db_data_source_name
+{{- end }}

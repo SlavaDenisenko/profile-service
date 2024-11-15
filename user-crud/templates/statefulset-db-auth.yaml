@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "user-crud.fullname" . }}-ss-db-auth
+spec:
+  serviceName: {{ .Values.services.db_auth.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "user-crud.fullname" . }}-ss-db-auth
+  template:
+    metadata:
+      labels:
+        app: {{ include "user-crud.fullname" . }}-ss-db-auth
+    spec:
+      containers:
+        - name: auth-postgres
+          image: {{ include "user-crud.db_auth.image" . }}
+          ports:
+            - containerPort: {{ .Values.db_auth.container.port }}
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_password
+          volumeMounts:
+            - name: {{ .Values.db_auth.container.volumeMount.name }}
+              mountPath: {{ .Values.db_auth.container.volumeMount.mountPath }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.db_auth.container.volumeMount.name }}
+      spec:
+        accessModes: {{ .Values.db_auth.container.volumeClaimTemplates.accessModes }}
+        resources:
+          requests:
+            storage: {{ .Values.db_auth.container.volumeClaimTemplates.resources.requests.storage }}

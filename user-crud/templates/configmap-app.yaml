@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.config.application.name }}
+  annotations:
+    "helm.sh/hook": pre-install
+data:
+  application.port: {{ .Values.application.http.port | quote }}
+  application.db.generation: {{ .Values.application.hibernate.generation }}
+  application.db.log: {{ .Values.application.hibernate.log }}
+  application.prometheus.histogram-enabled: {{ .Values.application.prometheus.histogram.enabled | quote }}
+  application.prometheus.histogram-percentiles: {{ .Values.application.prometheus.histogram.percentiles | quote }}

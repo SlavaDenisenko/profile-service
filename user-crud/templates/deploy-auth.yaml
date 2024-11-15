@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-crud.fullname" . }}-auth
+  labels:
+    app: {{ include "user-crud.fullname" . }}-auth
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "user-crud.fullname" . }}-auth
+  template:
+    metadata:
+      labels:
+        app: {{ include "user-crud.fullname" . }}-auth
+    spec:
+      containers:
+        - name: auth-service
+          image: {{ include "user-crud.auth.image" . }}
+          imagePullPolicy: {{ .Values.auth.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.auth.http.port }}
+              protocol: TCP
+          env:
+            - name: QUARKUS_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_url
+            - name: QUARKUS_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_username
+            - name: QUARKUS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.auth.name }}
+                  key: auth_db_password
+            - name: QUARKUS_DB_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.auth.name }}
+                  key: auth.db.log
+            - name: QUARKUS_DB_GENERATION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.auth.name }}
+                  key: auth.db.generation
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.config.auth.name }}
+                  key: auth.port

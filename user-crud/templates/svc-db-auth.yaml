@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.db_auth.name }}
+spec:
+  selector:
+    app: {{ include "user-crud.fullname" . }}-ss-db-auth
+  ports:
+    - protocol: TCP
+      port: {{ .Values.services.db_auth.port }}
+      targetPort: {{ .Values.db_auth.container.port }}

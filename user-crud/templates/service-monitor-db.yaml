@@ -1,0 +1,16 @@
+{{- if .Values.db_app.prometheus.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "user-crud.fullname" . }}-svc-mon-db
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "user-crud.fullname" . }}-db-exporter
+  endpoints:
+    - port: web
+      path: {{ .Values.db_app.prometheus.path }}
+      interval: {{ .Values.db_app.prometheus.interval }}
+{{- end }}
