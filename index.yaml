@@ -3,12 +3,12 @@ entries:
   user-crud:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2024-11-15T15:59:04.5617949+03:00"
+    created: "2024-11-15T16:08:56.9564499+03:00"
     description: A Helm chart for Kubernetes
-    digest: 2ac19db9e7f270870663a408d4f284c8f15ee1f78c1d015152cc2d4c48724416
+    digest: 2c979e6cd9f436a384d173e38d39526114d96eb99418c6cb4f7e27211e16eb77
     name: user-crud
     type: application
     urls:
     - https://SlavaDenisenko.github.io/profile-service/user-crud-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-15T15:59:04.5597753+03:00"
+generated: "2024-11-15T16:08:56.9552729+03:00"
